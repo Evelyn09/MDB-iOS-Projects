@@ -23,15 +23,18 @@ class StartVC: UIViewController {
         let label = UILabel()
         
         // == UIColor.darkGray
-        label.textColor = .darkGray
+        label.textColor = .magenta
         
         label.text = "Meet the Member"
+        
+        label.numberOfLines = 3
         
         // == NSTextAlignment(expected type).center
         label.textAlignment = .center
         
         // == UIFont.systemFont(ofSize: 27, UIFont.weight.medium)
-        label.font = .systemFont(ofSize: 27, weight: .medium)
+        label.font = .systemFont(ofSize: 50, weight: .medium)
+      
         
         // Must have if you are using constraints.
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -44,7 +47,12 @@ class StartVC: UIViewController {
         
         button.setTitle("Start", for: .normal)
         
-        button.setTitleColor(.blue, for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        
+        button.titleLabel?.font = .systemFont(ofSize: 60, weight: .medium)
+        
+        button.layer.cornerRadius = 25.0
+        
         
         // MARK: STEP 1: UIButton Customization
         // Action Items:
@@ -57,6 +65,7 @@ class StartVC: UIViewController {
         // where you will find all the available APIs.
         
         // MARK: >> Your Code Here <<
+        button.backgroundColor = .magenta
         
         button.translatesAutoresizingMaskIntoConstraints = false
         
@@ -85,6 +94,7 @@ class StartVC: UIViewController {
         // - Constraints can only be created in the same view hierarchy.
         //   So you have to add the view subview before creating constraints.
         view.addSubview(welcomeLabel)
+        view.addSubview(startButton)
         
         
         // And add the constraints
@@ -108,14 +118,23 @@ class StartVC: UIViewController {
             welcomeLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 50),
             
             //     welcomeLabel.trailingAnchor = view.trailingAnchor - 50
-            welcomeLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -50)
+            welcomeLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -50),
+            
+            startButton.topAnchor.constraint(equalTo: welcomeLabel.bottomAnchor, constant: 200),
+            
+            startButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -100),
+            
+            startButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 100),
+            
+            startButton.heightAnchor.constraint(equalTo: startButton.heightAnchor, constant: -30),
+            
+            startButton.widthAnchor.constraint(equalTo: startButton.heightAnchor, constant: 30)
+
         ])
         
         // MARK: >> Your Code Here <<
         
-        NSLayoutConstraint.activate([
-            // MARK: >> Your Code Here <<
-        ])
+ 
         
         
         // MARK: STEP 3: Adding Callbacks
