@@ -19,15 +19,17 @@ class MainVC: UIViewController {
     var currentStreak = 0
     var result = String()
     
+    
     var lastThree = [String]()
     var answer: String = ""
+
     
-    let timerLabel: UILabel = {
-        
-        let t = UILabel()
-        t.translatesAutoresizingMaskIntoConstraints = false
-        return t
-        
+    let progressView: UIProgressView = {
+        let pV = UIProgressView(progressViewStyle: .bar)
+        pV.trackTintColor = .white
+        pV.progressTintColor = .magenta
+        pV.translatesAutoresizingMaskIntoConstraints = false
+        return pV
     }()
     
     let pause: UIButton = {
@@ -97,7 +99,6 @@ class MainVC: UIViewController {
         }
         
     }()
-    
 
     // MARK: STEP 10: Stats Button
     // Action Items:
@@ -110,6 +111,7 @@ class MainVC: UIViewController {
     override func viewDidLoad() {
         
         view.backgroundColor = .white
+        
         
         // Create a timer that calls timerCallback() every one second
       
@@ -137,14 +139,13 @@ class MainVC: UIViewController {
             b.layer.cornerRadius = 25.0
         }
         
-        view.addSubview(timerLabel)
         view.addSubview(pause)
         view.addSubview(score)
         view.addSubview(stat)
+        view.addSubview(progressView)
         
         NSLayoutConstraint.activate([
             
-            //condense this
        
             imageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 180),
             
@@ -154,7 +155,6 @@ class MainVC: UIViewController {
             
             imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor),
             
-            //condense into loop or function later
             
             buttons[0].topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 50),
             
@@ -172,9 +172,8 @@ class MainVC: UIViewController {
             buttons[1].trailingAnchor.constraint(equalTo: buttons[1].leadingAnchor, constant: 150),
 
             buttons[1].bottomAnchor.constraint(equalTo: buttons[1].topAnchor, constant: 120),
-//
-//
-//
+
+            
             buttons[2].topAnchor.constraint(equalTo: buttons[0].bottomAnchor, constant: 20),
 
             buttons[2].trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: -10),
@@ -182,9 +181,8 @@ class MainVC: UIViewController {
             buttons[2].leadingAnchor.constraint(equalTo: buttons[0].trailingAnchor, constant: -150),
 
             buttons[2].bottomAnchor.constraint(equalTo: buttons[2].topAnchor, constant: 120),
-//
-//
-//
+
+            
             buttons[3].topAnchor.constraint(equalTo: buttons[0].bottomAnchor, constant: 20),
 
             buttons[3].leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: 10),
@@ -192,17 +190,6 @@ class MainVC: UIViewController {
             buttons[3].trailingAnchor.constraint(equalTo: buttons[1].leadingAnchor, constant: 150),
 
             buttons[3].bottomAnchor.constraint(equalTo: buttons[3].topAnchor, constant: 120),
-            
-            
-            
-            timerLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 110),
-
-            timerLabel.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: -35),
-
-            timerLabel.trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: 35),
-
-            timerLabel.bottomAnchor.constraint(equalTo: timerLabel.topAnchor, constant: 50),
-//
             
             
             pause.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 25),
@@ -232,6 +219,15 @@ class MainVC: UIViewController {
             score.trailingAnchor.constraint(equalTo: view.leadingAnchor, constant: 120),
 
             score.bottomAnchor.constraint(equalTo: score.topAnchor, constant: 50),
+            
+            
+            progressView.topAnchor.constraint(equalTo: view.topAnchor, constant: 110),
+            
+            progressView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 5),
+            
+            progressView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -5),
+            
+            progressView.bottomAnchor.constraint(equalTo: progressView.topAnchor, constant: 5)
         
         ])
         
@@ -245,7 +241,6 @@ class MainVC: UIViewController {
         for b in buttons{
             b.addTarget(self, action: #selector(didTapAnswer(_:)), for: .touchUpInside)
         }
-        
         stat.addTarget(self, action: #selector(paused(_:)), for: .touchUpInside)
         stat.addTarget(self, action: #selector(didTapStats(_:)), for: .touchUpInside)
         pause.addTarget(self, action: #selector(paused(_:)), for: .touchUpInside)
@@ -270,7 +265,6 @@ class MainVC: UIViewController {
         
         enableOrDisable(true)
         
-        
         if timer?.isValid != true{
             timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(timerCallback), userInfo: nil, repeats: true)
         }
@@ -279,7 +273,6 @@ class MainVC: UIViewController {
     func enableOrDisable(_ bo: Bool){
         for b in buttons{
             b.isEnabled = bo
-
         }
     }
     
@@ -291,7 +284,7 @@ class MainVC: UIViewController {
         //   the question instance
         
         // MARK: >> Your Code Here <<
-        
+
         seconds = 7
 
         timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(timerCallback), userInfo: nil, repeats: true)
@@ -306,6 +299,7 @@ class MainVC: UIViewController {
             buttons[i].setTitleColor(.white, for: .normal)
             buttons[i].titleLabel?.font = .systemFont(ofSize: 25)
             buttons[i].titleLabel?.lineBreakMode = .byWordWrapping
+            
             if name == question.answer{
                 answerIndex = i
             }
@@ -343,37 +337,29 @@ class MainVC: UIViewController {
         
         // MARK: >> Your Code Here <<
         
-        //if seconds == 0
+        progressView.setProgress(Float(seconds-2)*0.2, animated: true)
+ 
         if seconds == 2{
+            
+            progressView.setProgress(Float(seconds-2)*0.2, animated: true)
             
             if lastThree.count == 3{
                 lastThree.remove(at: 0)
             }
             
             lastThree.append("Incorrect")
-                    
-            //find faster way to look for answer in choices
-           
-            
+    
             enableOrDisable(false)
             buttons[answerIndex].backgroundColor = .systemGreen
-            
-        }
-        if seconds >= 2{
-            
-            timerLabel.text = String(seconds-2)
-            timerLabel.textAlignment = .center
-            timerLabel.font = .systemFont(ofSize: 40, weight: .medium)
-            timerLabel.textColor = .magenta
             
         }
         else if seconds == 0{
             
             timer?.invalidate()
+            progressView.setProgress(1, animated: true)
             getNextQuestion()
             return
         }
-        
         seconds-=1
     }
     
@@ -426,6 +412,8 @@ class MainVC: UIViewController {
             currentStreak = 0
             score.text = "Score: 0"
             
+            progressView.setProgress(Float(seconds-2)*0.2, animated: false)
+            
             timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(timerCallback), userInfo: nil, repeats: true)
             
             pause.setImage(UIImage(systemName: "pause.circle.fill"), for: .normal)
@@ -433,6 +421,7 @@ class MainVC: UIViewController {
         }
         else{
             
+            progressView.setProgress(Float(seconds-2)*0.2, animated: true)
             enableOrDisable(false)
 
             timer?.invalidate()
@@ -467,9 +456,7 @@ class MainVC: UIViewController {
         // - Read the example in StatsVC.swift, and replace it with
         //   your custom init for `StatsVC`
         // - Update the call site here on line 139
-        
-//        navigationController?.pushViewController(vc, animated: true)
-        
+            
         present(vc, animated: true, completion: nil)
     }
 }

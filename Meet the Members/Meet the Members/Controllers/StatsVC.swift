@@ -11,8 +11,6 @@ class StatsVC: UIViewController {
     
     // MARK: STEP 11: Going to StatsVC
     // Read the instructions in MainVC.swift
-    
-//    let dataExample: String
     let correctStreak: Int
     let lastThreeResult: [String]
     
@@ -60,8 +58,6 @@ class StatsVC: UIViewController {
         return back
 
     }()
-    
-    
     
     // MARK: >> Your Code Here <<
     
@@ -131,13 +127,6 @@ class StatsVC: UIViewController {
     }
     
     @objc func backToMain(_ sender: UIButton){
-    
-//        present(vc, animated: true, completion: nil)
-        
-        self.dismiss(animated: true, completion: nil)
-
+      self.dismiss(animated: true, completion: nil)
     }
-    
-    
-
 }
