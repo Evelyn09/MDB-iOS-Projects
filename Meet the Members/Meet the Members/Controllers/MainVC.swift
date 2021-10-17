@@ -168,8 +168,10 @@ class MainVC: UIViewController {
             buttons[1].topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 50),
             
             buttons[1].leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: 10),
+            
+            buttons[1].widthAnchor.constraint(equalToConstant: 150),
 
-            buttons[1].trailingAnchor.constraint(equalTo: buttons[1].leadingAnchor, constant: 150),
+//            buttons[1].trailingAnchor.constraint(equalTo: buttons[1].leadingAnchor, constant: 150),
 
             buttons[1].bottomAnchor.constraint(equalTo: buttons[1].topAnchor, constant: 120),
 
