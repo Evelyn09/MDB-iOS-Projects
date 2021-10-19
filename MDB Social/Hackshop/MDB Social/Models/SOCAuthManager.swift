@@ -8,6 +8,7 @@
 import Foundation
 import FirebaseAuth
 import FirebaseFirestore
+import Metal
 
 class SOCAuthManager {
     
@@ -41,6 +42,35 @@ class SOCAuthManager {
                 completion: ((Result<SOCUser, SignInErrors>)->Void)?) {
         
         /* TODO: Hackshop */
+        auth.signIn(signIn(withEmail: email, password: password, completion: {
+            (authResults: AuthDataResult?, error: Error?)-> Void in
+            
+            if let error = error {
+                let nsError = error as NSError
+                let errorCode = FirebaseAuth.AuthErrorCode(rawValue: nsError.code)
+                switch errorCode{
+                //this is creating results
+                case .wrongPassword:
+                    completion?(.failure(SignInErrors.wrongPassword))
+                
+                case .userNotFound:
+                    completion?(.failure(.userNotFound))
+                default:
+                    completion?(failture(.unspecified))
+                }
+                
+            return
+                
+        }
+        
+            guard let authResult = authResult else{
+                completion?(.failure(.internalError))
+                return
+            }
+            
+            self.linkUser(withuid: authResult.user.id, completion: completion)
+            
+        })
     }
     
     /* TODO: Firebase sign up handler, add user to firestore */
@@ -61,6 +91,10 @@ class SOCAuthManager {
                           completion: ((Result<SOCUser, SignInErrors>)->Void)?) {
         
         /* TODO: Hackshop */
+            userListener = db.collection("users").document(uid).addSnapshotListener
+            {
+                
+            }
     }
     
     private func unlinkCurrentUser() {

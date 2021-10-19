@@ -147,6 +147,29 @@ class SigninVC: UIViewController {
         }
         
         /* TODO: Hackshop */
+        SOCAuthManager.shared.signIn(withEmail: email, password: password, completion: { (result: Result <SOCUser, SOCAuthManager.SignInErrors>) ->Void in
+            
+            switch result{
+                
+            //could use .success(let user) but that would be redundant
+            case .success:
+                guard let window = UIApplication.shared.windows.filter( { $0.isKeyWindow}).first else {return}
+                let vc = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController()
+                window.rootViewController = vc
+                let options: UIView.AnimationOptions = .transitionsCrossDissolve
+                let duration: TimeInterval = 0.3
+                UIView.transition(with: window, duration: duration, options: options, animations: {}, completion: nil)
+            case .failure(let error):
+                switch error{
+                case .userNotFound:
+                    self.showErrorBanner(withTitle: "User Not Found", subtitle: "Please check your email")
+                //not the best, you should tell the user what's wrong with their login
+                default:
+                    self.showErrorBanner(withTitle: "Unknown Error", subtitle: "")
+                }
+                
+            }
+        })
     }
     
     @objc private func didTapSignUp(_ sender: UIButton) {

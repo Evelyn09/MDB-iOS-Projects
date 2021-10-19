@@ -8,58 +8,70 @@
 import UIKit
 
 class PokedexVC: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
-
     
     let pokemons = PokemonGenerator.shared.getPokemonArray()
-
-    @IBOutlet var collectionView: UICollectionView!
-//    @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
- 
+    var currentPokemon: Pokemon?
     
+    @IBAction func goToNext(_ sender: Any) {
+        
+       
+        performSegue(withIdentifier: "mySegue", sender: self)
+        
+    }
+    
+    @IBOutlet var collectionView: UICollectionView!
+     
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 32, left: 8, bottom: 8, right: 8)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+        let width = (view.frame.width - 36) / 3
+        return CGSize(width: width, height: width)
+    }
+        
+
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         // Set the number of items in your collection view.
         return pokemons.count
     }
     
+
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         // Access
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CollectionViewCell", for: indexPath) as! CollectionViewCell
         // Do any custom modifications you your cell, referencing the outlets you defined in the Custom cell file.
-        cell.backgroundColor = UIColor.blue
-        
-     
- 
-//        let url = pokemons[indexPath.row].imageUrl
-//            do{
-//                let data = try Data(contentsOf: url)
-//                cell.imageView.image = UIImage(data: data)
-//            }catch let err{
-//                print("Error: \(err.localizedDescription)")
-//            }
-//        }
+//        cell.backgroundColor = UIColor.blue
        
      
-        let u = pokemons[indexPath.row].imageUrl
+        currentPokemon = pokemons[indexPath.row]
+        let url = currentPokemon?.imageUrl
 
-        if u != nil {
-            cell.imageView.loadImge(u!)
-
+        if url != nil {
+            cell.imageView.loadImge(url!)
         }
-//
 
         return cell
     }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+
+        return 1
+    }
     
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-//
-//        return 4
-//    }
-//
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-//
-//        return 1
-//    }
     
+  
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?)
+    {
+        if (segue.identifier == "mySegue") {
+            let vc = segue.destination as? ProfileVC
+            vc?.po = currentPokemon
+            
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -71,6 +83,9 @@ class PokedexVC: UIViewController, UICollectionViewDataSource, UICollectionViewD
     }
   
 }
+
+
+
 
 extension UIImageView {
     func loadImge(_ url: URL) {

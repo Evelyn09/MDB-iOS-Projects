@@ -18,6 +18,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let windowScene = (scene as? UIWindowScene) else { return }
         /* TODO: Hackshop */
+        window = UIWindow(frame: UIScreen.main.bounds)
+        window?.windowScene = windowScene
+        var vc: UIViewController?
+        if SOCAuthManager.shared.isSignedIn(){
+            vc = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController()
+        }else{
+            vc = UIStoryboard(name: "Auth", bundle: nil).instantiateInitialViewController()
+        }
+        
+        window?.rootViewController = vc
+        window?.makeKeyAndVisible()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
