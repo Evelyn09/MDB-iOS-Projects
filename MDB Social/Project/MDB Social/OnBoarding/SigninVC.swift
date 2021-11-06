@@ -83,6 +83,7 @@ class SigninVC: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         hideKeyboardWhenTappedAround()
         view.backgroundColor = .background
         
@@ -136,13 +137,14 @@ class SigninVC: UIViewController {
         signUpActionLabel.addTarget(self, action: #selector(didTapSignUp(_:)), for: .touchUpInside)
     }
 
-    @objc func didTapSignIn(_ sender: UIButton) {
+    @objc private func didTapSignIn(_ sender: UIButton) {
         guard let email = emailTextField.text, email != "" else {
-            showErrorBanner(withTitle: "Missing email", subtitle: "Please provide an email")
+            showErrorBanner(withTitle: "Missing email", subtitle: "Please enter you email address")
             return
         }
         
         guard let password = passwordTextField.text, password != "" else {
+            showErrorBanner(withTitle: "Missing password", subtitle: "Please enter your password")
             return
         }
         
@@ -154,22 +156,26 @@ class SigninVC: UIViewController {
                 self.signinButton.hideLoading()
             }
             
+            //if all is a success, transitions to home page, DOES NOT LINK USER HERE
             switch result {
-            case .success(let _):
-                guard let window = UIApplication.shared.windows.filter({ $0.isKeyWindow }).first else { return }
+            case .success:
+                guard let window = self.view.window else { return }
                 let vc = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController()
                 window.rootViewController = vc
                 let options: UIView.AnimationOptions = .transitionCrossDissolve
                 let duration: TimeInterval = 0.3
                 UIView.transition(with: window, duration: duration, options: options, animations: {}, completion: nil)
+                
             case .failure(let error):
                 switch error {
                 case .userNotFound:
-                    self.showErrorBanner(withTitle: "User not found", subtitle: "Please provide an email")
+                    self.showErrorBanner(withTitle: "User not found", subtitle: "Please check your email address")
                 case .wrongPassword:
-                    self.showErrorBanner(withTitle: "User not found", subtitle: "Please provide an email")
+                    self.showErrorBanner(withTitle: "Incorrect password", subtitle: "Please check your password")
+                case .invalidEmail:
+                    self.showErrorBanner(withTitle: "Not a valid email", subtitle: "Please check your email address")
                 default:
-                    self.showErrorBanner(withTitle: "User not found", subtitle: "Please provide an email")
+                    self.showErrorBanner(withTitle: "Internal error", subtitle: "")
                 }
             }
         }
@@ -177,15 +183,23 @@ class SigninVC: UIViewController {
     
     @objc private func didTapSignUp(_ sender: UIButton) {
         
+        
+        let vc = SignUpVC()
+            
+        present(vc, animated: true, completion: nil)
+        
     }
     
     private func showErrorBanner(withTitle title: String, subtitle: String? = nil) {
+        showBanner(withStyle: .warning, title: title, subtitle: subtitle)
+    }
+    
+    private func showBanner(withStyle style: BannerStyle, title: String, subtitle: String?) {
         guard bannerQueue.numberOfBanners == 0 else { return }
         let banner = FloatingNotificationBanner(title: title, subtitle: subtitle,
                                                 titleFont: .systemFont(ofSize: 17, weight: .medium),
-                                                subtitleFont: subtitle != nil ?
-                                                    .systemFont(ofSize: 14, weight: .regular) : nil,
-                                                style: .warning)
+                                                subtitleFont: .systemFont(ofSize: 14, weight: .regular),
+                                                style: style)
         
         banner.show(bannerPosition: .top,
                     queue: bannerQueue,

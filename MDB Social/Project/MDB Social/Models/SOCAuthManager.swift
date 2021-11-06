@@ -9,6 +9,7 @@ import Foundation
 import FirebaseAuth
 import FirebaseFirestore
 
+
 class SOCAuthManager {
     
     static let shared = SOCAuthManager()
@@ -24,6 +25,15 @@ class SOCAuthManager {
         case errorDecodingUserDoc
         case unspecified
     }
+    
+    enum SignUpErrors: Error {
+        case emailAlreadyInUse
+        case weakPassword
+        case internalError
+        case unspecified
+        
+    }
+    
     
     let db = Firestore.firestore()
     
@@ -62,11 +72,74 @@ class SOCAuthManager {
                 return
             }
             
+            //my comment - since no error occured, the user is now linked
             self?.linkUser(withuid: authResult.user.uid, completion: completion)
+            
+            
+            
         }
     }
     
     /* TODO: Firebase sign up handler, add user to firestore */
+    
+
+    
+    func signUp(withEmail email: String, userName: String, password: String, fullName: String, completion: ((Result<SOCUser, SignUpErrors>)->Void)?) {
+        
+        //*READ* my code can succesfully create and write in data for a new user into firebase, I've tested it. I just have NO idea why the feedvc shows up first (if it even is doing that while you'e testing it). I don't know how to solve it either because sometimes the correct sign in page shows up first and sometimes feedvc shows up first, without me changing anything. ok thank you bye
+        auth.createUser(withEmail: email, password: password) { [weak self] authResult, error in
+            
+            if let error = error {
+                let nsError = error as NSError
+                let errorCode = FirebaseAuth.AuthErrorCode(rawValue: nsError.code)
+                
+                switch errorCode {
+                case .emailAlreadyInUse:
+                    completion?(.failure(.emailAlreadyInUse))
+                case .weakPassword:
+                    completion?(.failure(.weakPassword))
+                default:
+                    completion?(.failure(.unspecified))
+                }
+                return
+            }
+            guard let authResult = authResult else {
+                completion?(.failure(.internalError))
+                return
+            }
+             
+            self!.db.collection("users").document(authResult.user.uid).setData([
+                "email": email,
+                "fullname": fullName,
+                "savedEvents": [],
+                "username": userName
+                
+            ]) { err in
+                if let err = err {
+                    print("Error writing document: \(err)")
+                } else {
+
+                    
+                    self?.userListener = self?.db.collection("users").document(authResult.user.uid).addSnapshotListener { [weak self] docSnapshot, error in
+                        
+                        let document = docSnapshot
+                        
+                        let user = try? document!.data(as: SOCUser.self)
+                        self?.currentUser = user
+                        completion?(.success(user!))
+                        
+                        
+                    }
+               
+                    
+                }
+            }
+           
+        }
+    
+    }
+                    
+        
     
     func isSignedIn() -> Bool {
         return auth.currentUser != nil
